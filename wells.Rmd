@@ -1,45 +1,30 @@
-########################################################################################
-## WELLS.R
-## Script used to select a random sample of Wells notices from those sent during a 
-## specified time frame.  This file shows the code used to create the WELLS.RMD 
-## markdown document. Remember, it's the code in the WELLS.RMD document that is 
-## actually executed when you run the code below
-## LMENDOZA
-## 2015-01-26
-########################################################################################
-
-################################# RUN THIS CODE #################################
-## create a name consisting of "Wells " + today's date
-outname = paste("Wells ", as.character(Sys.Date()), sep = "")
-setwd("C:/GitHub/HC")
-knit2html("wells.Rmd", output = outname)
+---
+title: "Wells samples"
+author: "Lee Mendoza"
+output: pdf_document
+---
 
 
-
-
-
-
-## include necessary libraries
+```{r echo =FALSE, message=FALSE }
 require(XML)
 require(plyr)
 
-## change the working directory. Wells.Rmd needs to be in this folder
 setwd("C:/GitHub/HC")
 ###############################################################
 ## start date of sample ------  MODIFY THIS!
-beginDate = as.Date("2014-12-22")
+beginDate = as.Date("2015-01-21")
 ## end date of sample --------  MODIFY THIS!
-endDate = as.Date("2015-01-20")
+endDate = as.Date("2015-01-27")
 ###############################################################
-
+```
 ## Wells Samples
 ### This document shows statistics of the adverse notices sent during the period between `r beginDate ` and `r endDate `.  A random sample of three percent of the letters sent for each program is selected and listed below.
-#### Document created `r Sys.Date() `
+#### Document created `r Sys.Date() ` at `r strftime(Sys.time(), format="%H:%M:%S") `
 
-
-    ### Notices per program, with sample size
-    ### The sample size is determined by rounding up 3 percent of the number of letters sent in a program to the next highest integer
-
+---
+### Notices per program, with sample size
+The sample size is determined by rounding up 3 percent of the number of letters sent in a program to the next highest integer
+```{r kable, results="asis", echo = FALSE, warning = FALSE}
 ## this is the location of the Wells tracking data maintained by the regions
 ## and NFA
 ## external link
@@ -86,22 +71,37 @@ perProgram$sampleSize = as.integer(perProgram$threePercent) + 1
 sample = NULL
 
 ## output
-## kable(perProgram)
+kable(perProgram)
+```
 
-
+---
 ### The sample:
+```{r results="asis", echo = FALSE, warning = FALSE}
 for (i in 1:nrow(perProgram)){
     ## programLetters = filter by program
     programLetters = dateFiltered[which(dateFiltered$ProgramValue == perProgram[i, "ProgramValue"]),]
     programSample = programLetters[1:perProgram[i, "sampleSize"],]
     sample = rbind(sample, data.frame(cbind(as.character(programSample$ClientLastName), 
-                                            as.character(programSample$ClientFirstName), 
-                                            as.character(programSample$SSN), 
-                                            as.character(programSample$ProgramValue), 
-                                            as.character(programSample$DateLetterSent))))
+                    as.character(programSample$ClientFirstName), 
+                    as.character(programSample$SSN), 
+                    as.character(programSample$ProgramValue), 
+                    as.character(programSample$DateLetterSent))))
     
 }
 names(sample) = c("Last Name", "First Name", "SSN", "Program", "Date Letter Sent")
-###kable(sample)
-
+kable(sample)
+writeLines("")
+writeLines("")
+```
+---
+<br> 
+<br>
+<br>
+<br>
+<br>
+---
+### Session information
+```{r echo = FALSE}
+sessionInfo() 
+```
 
